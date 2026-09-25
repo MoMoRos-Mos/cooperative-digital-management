@@ -1,0 +1,7 @@
+## บอก Git ว่าไฟล์ไหนห้ามเอาขึ้น Repository
+.env
+.venv/
+__pycache__/
+*.pyc
+.vscode/
+*.log

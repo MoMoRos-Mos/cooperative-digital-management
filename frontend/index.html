@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Cooperative Digital Management</title>
+
+    <link rel="icon" type="image/png" href="favicon.png">
+    <!--Link New font-->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <!-- เทคนิคนี้จะหลอกให้บราวเซอร์คิดว่าเป็นไฟล์ใหม่ และยอมโหลดโค้ด CSS ตัวล่าสุดของคุณขึ้นมาแสดงผลเสมอครับ -->
+    <link rel="stylesheet" href="style.css?v=1">
+    <!-- นำเข้า Bootstrap Icons ผ่าน CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+</head>
+
+<body>
+    <main class="app-container">
+
+        <header class="page-header">
+
+            <!-- สร้าง div ครอบ Logo และ ข้อความ ให้อยู่กลุ่มเดียวกันฝั่งซ้าย -->
+            <div style="display: flex; align-items: center; gap: 24px;">
+                <img src="Images/logo.png" class="app-logo" alt="Cooperative Digital Management Logo">
+                <div>
+                    <p class="eyebrow">DIGITAL MANAGEMENT SYSTEM</p>
+                    <h1>Cooperative Digital Management</h1>
+                    <p class="page-subtitle">Savings Cooperative Management Prototype</p>
+                </div>
+            </div>
+
+            <!-- ป้าย Badge จะถูกดันไปอยู่ฝั่งขวาอัตโนมัติ -->
+            <span class="prototype-badge">
+                PERSONAL PROTOTYPE
+            </span>
+
+        </header>
+
+        <section class="row g-3 dashboard">
+
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="kpi-card h-100">
+                    <div class="kpi-label">
+                        <!-- เติมไอคอนรูปกลุ่มคน -->
+                        <i class="bi bi-people-fill text-info"></i> สมาชิกทั้งหมด
+                    </div>
+                    <div id="total-member" class="kpi-value">0</div>
+                    <div class="kpi-meta">Total Members</div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="kpi-card h-100">
+                    <div class="kpi-label">
+                        <i class="bi bi-person-check-fill text-success"></i> สมาชิก ACTIVE
+                    </div>
+                    <div id="active-member" class="kpi-value">0</div>
+                    <div class="kpi-meta">Active Members</div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="kpi-card h-100">
+                    <div class="kpi-label">
+                        <i class="bi bi-person-x-fill text-danger"></i> สมาชิก INACTIVE
+                    </div>
+                    <div id="inactive-member" class="kpi-value">0</div>
+                    <div class="kpi-meta">Inactive Members</div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="kpi-card h-100">
+                    <div class="kpi-label">
+                        <i class="bi bi-cash-stack text-primary"></i> ยอดเงินฝากรวม
+                    </div>
+                    <div id="total-deposit" class="kpi-value">0</div>
+                    <div class="kpi-meta">Total Deposits</div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="kpi-card h-100">
+                    <div class="kpi-label">
+                        <!-- แทนที่ 🧾 ด้วยไอคอนใบเสร็จ -->
+                        <i class="bi bi-receipt-cutoff text-secondary"></i> ยอดเงินกู้รวม
+                    </div>
+                    <div id="total-principal" class="kpi-value">0</div>
+                    <div class="kpi-meta">Total Loan Principal</div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="kpi-card h-100">
+                    <div class="kpi-label">
+                        <!-- แทนที่ ✅ ด้วยไอคอนติ๊กถูก -->
+                        <i class="bi bi-check-circle-fill text-success"></i> ยอดเงินรวมที่ชำระแล้ว
+                    </div>
+                    <div id="total-principal-paid" class="kpi-value">0</div>
+                    <div class="kpi-meta">Total Principal Paid</div>
+                </div>
+            </div>
+
+            <div class="col-12 col-md-6 col-xl-3">
+                <div class="kpi-card h-100">
+                    <div class="kpi-label">
+                        <!-- แทนที่ ⚠️ ด้วยไอคอนป้ายเตือน -->
+                        <i class="bi bi-exclamation-triangle-fill text-danger"></i> ยอดหนี้รวมที่คงเหลือ
+                    </div>
+                    <div id="outstanding" class="kpi-value">0</div>
+                    <div class="kpi-meta">Outstanding Principal</div>
+                </div>
+            </div>
+
+        </section>
+
+        <section class="management-card">
+
+            <div class="section-header">
+
+                <div>
+                    <p class="section-kicker">
+                        MEMBER MANAGEMENT
+                    </p>
+
+                    <h2 id="member-form-title">
+                        <!-- แทนที่ 🪪 ด้วยไอคอนบัตรพนักงาน -->
+                        Add Member <i class="bi bi-person-vcard"></i>
+                    </h2>
+                </div>
+
+            </div>
+
+            <form id="add-member-form" class="row g-3">
+
+                <div class="col-12 col-md-4">
+                    <label for="member-no" class="form-label">Member No</label>
+                    <input type="text" id="member-no" class="form-control" placeholder="เช่น M001" required>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label for="full-name" class="form-label">Full Name</label>
+                    <input type="text" id="full-name" class="form-control" placeholder="ชื่อสมาชิก" required>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label for="department" class="form-label">Department</label>
+                    <input type="text" id="department" class="form-control" placeholder="เช่น Finance">
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label for="join-date" class="form-label">Join Date</label>
+                    <input type="date" id="join-date" class="form-control" required>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label for="status" class="form-label">Status</label>
+                    <select id="status" class="form-select">
+                        <option value="ACTIVE">ACTIVE</option>
+                        <option value="INACTIVE">INACTIVE</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <label class="form-label invisible">Action</label>
+                    <button type="submit" id="member-submit-button" class="btn btn-primary w-100">
+                        Add Member <i class="bi bi-person-vcard"></i>
+                    </button>
+                </div>
+
+                <div class="col-12 col-md-4">
+                    <button type="button" id="cancel-edit-button" class="btn btn-outline-secondary w-100">
+                        <i class="bi bi-eraser"></i> Clear Form
+                    </button>
+                </div>
+
+            </form>
+        </section>
+
+        <section class="management-card">
+
+            <div class="members-header">
+                <div>
+                    <p class="section-kicker">MEMBER DATABASE</p>
+                    <h2>Members</h2>
+                </div>
+
+                <div class="search-box">
+                    <span class="search-icon">
+                        <!-- แทนที่ 🔎 ด้วยไอคอนแว่นขยาย -->
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" id="member-search" class="form-control"
+                        placeholder="ค้นหาเลขสมาชิก ชื่อ แผนก หรือสถานะ...">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle member-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Member No</th>
+                            <th>Name</th>
+                            <th>Department</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="member-table-body"></tbody>
+                </table>
+            </div>
+
+        </section>
+
+        <div id="custom-toast" class="custom-toast" hidden></div>
+
+        <script src="app.js"></script>
+
+    </main>
+</body>
+
+</html>
