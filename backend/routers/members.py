@@ -5,20 +5,17 @@ from psycopg2 import IntegrityError
 from backend.db import get_connection
 from backend.schemas import MemberCreate, MemberUpdate
 
-router = APIRouter(
-    prefix="/members",
-    tags=["Members"]
-)
+router = APIRouter(prefix="/members", tags=["Members"])
+
 
 ## Get all members
 @router.get("")
 def get_members():
     connection = get_connection()
-    cursor = connection.cursor(
-        cursor_factory = RealDictCursor
-    )
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
 
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT
             member_id,
             member_no,
@@ -28,7 +25,8 @@ def get_members():
             status
         FROM members
         ORDER BY member_id;
-    """)
+    """
+    )
 
     rows = cursor.fetchall()
 
@@ -37,15 +35,15 @@ def get_members():
 
     return rows
 
+
 @router.get("/{member_id}")
 def get_member(member_id: int):
     connection = get_connection()
 
-    cursor = connection.cursor(
-        cursor_factory = RealDictCursor
-    )
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
 
-    cursor.execute("""
+    cursor.execute(
+        """
         SELECT
             member_id,
             member_no,
@@ -56,7 +54,9 @@ def get_member(member_id: int):
         FROM members
         WHERE member_id = %s;
 
-    """,(member_id,))
+    """,
+        (member_id,),
+    )
 
     member = cursor.fetchone()
 
@@ -64,24 +64,21 @@ def get_member(member_id: int):
     connection.close()
 
     if member is None:
-        raise HTTPException(
-            status_code = 404,
-            detail = "Member not found"
-        )
+        raise HTTPException(status_code=404, detail="Member not found")
     return member
+
 
 ## POST /members
 @router.post("", status_code=201)
 def create_member(member: MemberCreate):
-    
+
     connection = get_connection()
 
-    cursor = connection.cursor(
-        cursor_factory=RealDictCursor
-    )
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
 
     try:
-        cursor.execute("""
+        cursor.execute(
+            """
             INSERT INTO members
             (
                 member_no,
@@ -99,13 +96,15 @@ def create_member(member: MemberCreate):
                 department,
                 join_date,
                 status;
-        """, (
-            member.member_no,
-            member.full_name,
-            member.department,
-            member.join_date,
-            member.status
-        ))
+        """,
+            (
+                member.member_no,
+                member.full_name,
+                member.department,
+                member.join_date,
+                member.status,
+            ),
+        )
 
         new_member = cursor.fetchone()
 
@@ -116,10 +115,7 @@ def create_member(member: MemberCreate):
     except IntegrityError:
         connection.rollback()
 
-        raise HTTPException(
-            status_code=409,
-            detail="Member number already exists"
-        )
+        raise HTTPException(status_code=409, detail="Member number already exists")
 
     finally:
         cursor.close()
@@ -128,17 +124,13 @@ def create_member(member: MemberCreate):
 
 ## PUT /members/{id}
 @router.put("/{member_id}")
-def update_member(
-    member_id: int,
-    member: MemberUpdate
-):
+def update_member(member_id: int, member: MemberUpdate):
     connection = get_connection()
 
-    cursor = connection.cursor(
-        cursor_factory=RealDictCursor
-    )
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
 
-    cursor.execute("""
+    cursor.execute(
+        """
         UPDATE members
         SET
             full_name = %s,
@@ -153,13 +145,15 @@ def update_member(
             department,
             join_date,
             status;
-    """, (
+    """,
+        (
             member.full_name,
             member.department,
             member.join_date,
             member.status,
-            member_id
-        ))
+            member_id,
+        ),
+    )
 
     updated_member = cursor.fetchone()
 
@@ -169,10 +163,7 @@ def update_member(
         cursor.close()
         connection.close()
 
-        raise HTTPException(
-            status_code=404,
-            detail="Member not found"
-        )
+        raise HTTPException(status_code=404, detail="Member not found")
 
     connection.commit()
 
@@ -187,11 +178,10 @@ def update_member(
 def deactivate_member(member_id: int):
     connection = get_connection()
 
-    cursor = connection.cursor(
-        cursor_factory=RealDictCursor
-    )
+    cursor = connection.cursor(cursor_factory=RealDictCursor)
 
-    cursor.execute("""
+    cursor.execute(
+        """
         UPDATE members
         SET status = 'INACTIVE'
         WHERE member_id = %s
@@ -202,8 +192,10 @@ def deactivate_member(member_id: int):
             department,
             join_date,
             status;
-    """, (member_id,))
-    
+    """,
+        (member_id,),
+    )
+
     member = cursor.fetchone()
 
     if member is None:
@@ -212,19 +204,11 @@ def deactivate_member(member_id: int):
         cursor.close()
         connection.close()
 
-        raise HTTPException(
-            status_code=404,
-            detail="Member not found"
-        )    
-    
+        raise HTTPException(status_code=404, detail="Member not found")
+
     connection.commit()
 
     cursor.close()
     connection.close()
 
-    return {
-        "message": "Member deactivated",
-        "member": member
-    }
-    
-    
+    return {"message": "Member deactivated", "member": member}

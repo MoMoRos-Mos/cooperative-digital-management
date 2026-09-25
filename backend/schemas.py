@@ -1,3 +1,5 @@
+from nt import access
+import token
 from pydantic import BaseModel
 from datetime import date
 
@@ -14,3 +16,12 @@ class MemberUpdate(BaseModel): ## Class: Update new member
     join_date: date
     status: str
 
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+class TokenResponse(BaseModel): ## โครงสร้างของ Token Reseponse ที่ต้องสร้างให้ครบ
+    access_token: str
+    token_type: str
+    role: str
+    status: str

@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from backend.routers import members
 from backend.routers import dashboard
 
+from backend.routers import auth
+
 app = FastAPI(
     title="Cooperative Digital Management API"
 )
@@ -27,3 +29,4 @@ def root():
 
 app.include_router(members.router)
 app.include_router(dashboard.router)
+app.include_router(auth.router)
