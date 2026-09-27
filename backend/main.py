@@ -1,4 +1,6 @@
+from tracemalloc import Statistic
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
 from backend.routers import members
@@ -30,3 +32,12 @@ def root():
 app.include_router(members.router)
 app.include_router(dashboard.router)
 app.include_router(auth.router)
+
+app.mount(
+    "/app",
+    StaticFiles(
+        directory="frontend",
+        html=True
+    ),
+    name="frontend"
+)

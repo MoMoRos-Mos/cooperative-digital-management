@@ -1,5 +1,5 @@
 // Call Variable where to send Data/API
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = window.location.origin;
 
 // Call variable can change value anytime by : let
 let allMembers = [];
