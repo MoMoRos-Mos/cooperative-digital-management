@@ -7,9 +7,8 @@
     <title>Cooperative Digital Management</title>
 
     <link rel="icon" type="image/png" href="favicon.png" />
-    <!--Link New font-->
     <link
-      href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <link
@@ -18,9 +17,7 @@
       integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
       crossorigin="anonymous"
     />
-    <!-- เทคนิคนี้จะหลอกให้บราวเซอร์คิดว่าเป็นไฟล์ใหม่ และยอมโหลดโค้ด CSS ตัวล่าสุดของคุณขึ้นมาแสดงผลเสมอครับ -->
-    <link rel="stylesheet" href="style.css?v=1" />
-    <!-- นำเข้า Bootstrap Icons ผ่าน CDN -->
+    <link rel="stylesheet" href="style.css?v=2" />
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
@@ -30,7 +27,6 @@
   <body>
     <main class="app-container">
       <header class="page-header">
-        <!-- สร้าง div ครอบ Logo และ ข้อความ ให้อยู่กลุ่มเดียวกันฝั่งซ้าย -->
         <div style="display: flex; align-items: center; gap: 24px">
           <img
             src="Images/logo.png"
@@ -45,16 +41,31 @@
             </p>
           </div>
         </div>
-
-        <!-- ป้าย Badge จะถูกดันไปอยู่ฝั่งขวาอัตโนมัติ -->
         <span class="prototype-badge"> PERSONAL PROTOTYPE </span>
       </header>
 
-      <section class="row g-3 dashboard">
-        <div class="col-12 col-md-6 col-xl-3">
+      <div class="auth-panel">
+        <div id="login-box" class="login-box">
+          <input id="login-username" type="text" placeholder="Username" />
+          <input id="login-password" type="password" placeholder="Password" />
+          <button id="login-button" type="button">
+            <i class="bi bi-box-arrow-in-right"></i> Login
+          </button>
+        </div>
+
+        <div id="user-box" style="display: none">
+          <span id="current-user-text"> - </span>
+          <button id="logout-button" type="button">
+            <i class="bi bi-box-arrow-right"></i> Logout
+          </button>
+        </div>
+      </div>
+
+      <section class="row g-4 dashboard">
+        <!-- หมวดสมาชิก (แถวบน 3 ใบ) -->
+        <div class="col-12 col-md-4 col-xl-4">
           <div class="kpi-card h-100">
             <div class="kpi-label">
-              <!-- เติมไอคอนรูปกลุ่มคน -->
               <i class="bi bi-people-fill text-info"></i> สมาชิกทั้งหมด
             </div>
             <div id="total-member" class="kpi-value">0</div>
@@ -62,7 +73,7 @@
           </div>
         </div>
 
-        <div class="col-12 col-md-6 col-xl-3">
+        <div class="col-12 col-md-4 col-xl-4">
           <div class="kpi-card h-100">
             <div class="kpi-label">
               <i class="bi bi-person-check-fill text-success"></i> สมาชิก ACTIVE
@@ -72,7 +83,7 @@
           </div>
         </div>
 
-        <div class="col-12 col-md-6 col-xl-3">
+        <div class="col-12 col-md-4 col-xl-4">
           <div class="kpi-card h-100">
             <div class="kpi-label">
               <i class="bi bi-person-x-fill text-danger"></i> สมาชิก INACTIVE
@@ -82,6 +93,7 @@
           </div>
         </div>
 
+        <!-- หมวดการเงิน (แถวล่าง 4 ใบ) -->
         <div class="col-12 col-md-6 col-xl-3">
           <div class="kpi-card h-100">
             <div class="kpi-label">
@@ -95,8 +107,7 @@
         <div class="col-12 col-md-6 col-xl-3">
           <div class="kpi-card h-100">
             <div class="kpi-label">
-              <!-- แทนที่ 🧾 ด้วยไอคอนใบเสร็จ -->
-              <i class="bi bi-receipt-cutoff text-secondary"></i> ยอดเงินกู้รวม
+              <i class="bi bi-receipt-cutoff text-warning"></i> ยอดเงินกู้รวม
             </div>
             <div id="total-principal" class="kpi-value">0</div>
             <div class="kpi-meta">Total Loan Principal</div>
@@ -106,9 +117,8 @@
         <div class="col-12 col-md-6 col-xl-3">
           <div class="kpi-card h-100">
             <div class="kpi-label">
-              <!-- แทนที่ ✅ ด้วยไอคอนติ๊กถูก -->
               <i class="bi bi-check-circle-fill text-success"></i>
-              ยอดเงินรวมที่ชำระแล้ว
+              ยอดชำระแล้ว
             </div>
             <div id="total-principal-paid" class="kpi-value">0</div>
             <div class="kpi-meta">Total Principal Paid</div>
@@ -118,9 +128,8 @@
         <div class="col-12 col-md-6 col-xl-3">
           <div class="kpi-card h-100">
             <div class="kpi-label">
-              <!-- แทนที่ ⚠️ ด้วยไอคอนป้ายเตือน -->
               <i class="bi bi-exclamation-triangle-fill text-danger"></i>
-              ยอดหนี้รวมที่คงเหลือ
+              ยอดหนี้คงเหลือ
             </div>
             <div id="outstanding" class="kpi-value">0</div>
             <div class="kpi-meta">Outstanding Principal</div>
@@ -128,14 +137,12 @@
         </div>
       </section>
 
-      <section class="management-card">
+      <section id="member-management-section" class="management-card">
         <div class="section-header">
           <div>
             <p class="section-kicker">MEMBER MANAGEMENT</p>
-
             <h2 id="member-form-title">
-              <!-- แทนที่ 🪪 ด้วยไอคอนบัตรพนักงาน -->
-              Add Member <i class="bi bi-person-vcard"></i>
+              Add Member <i class="bi bi-person-vcard text-primary ms-2"></i>
             </h2>
           </div>
         </div>
@@ -186,24 +193,21 @@
             </select>
           </div>
 
-          <div class="col-12 col-md-4">
-            <label class="form-label invisible">Action</label>
+          <!-- จัดกลุ่มปุ่มให้อยู่บรรทัดล่างสุดเสมอ -->
+          <div class="col-12 col-md-4 d-flex align-items-end gap-2">
             <button
               type="submit"
               id="member-submit-button"
-              class="btn btn-primary w-100"
+              class="btn btn-primary w-50"
             >
-              Add Member <i class="bi bi-person-vcard"></i>
+              Save <i class="bi bi-check2-circle ms-1"></i>
             </button>
-          </div>
-
-          <div class="col-12 col-md-4">
             <button
               type="button"
               id="cancel-edit-button"
-              class="btn btn-outline-secondary w-100"
+              class="btn btn-light border w-50"
             >
-              <i class="bi bi-eraser"></i> Clear Form
+              <i class="bi bi-eraser"></i> Clear
             </button>
           </div>
         </form>
@@ -213,12 +217,11 @@
         <div class="members-header">
           <div>
             <p class="section-kicker">MEMBER DATABASE</p>
-            <h2>Members</h2>
+            <h2>Members List</h2>
           </div>
 
           <div class="search-box">
             <span class="search-icon">
-              <!-- แทนที่ 🔎 ด้วยไอคอนแว่นขยาย -->
               <i class="bi bi-search"></i>
             </span>
             <input
@@ -231,7 +234,7 @@
         </div>
 
         <div class="table-responsive">
-         <table class="table table-dark table-hover align-middle member-table mb-0">
+          <table class="table table-hover align-middle member-table mb-0">
             <thead>
               <tr>
                 <th>ID</th>

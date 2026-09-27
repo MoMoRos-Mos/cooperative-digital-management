@@ -1,16 +1,18 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends, status
 from psycopg2.extras import RealDictCursor
 from psycopg2 import IntegrityError
 
 from backend.db import get_connection
 from backend.schemas import MemberCreate, MemberUpdate
 
+from backend.authdependencies import get_current_user, require_admin
+
 router = APIRouter(prefix="/members", tags=["Members"])
 
 
 ## Get all members
 @router.get("")
-def get_members():
+def get_members(): ## If want onlu user/admin see member current_user=Depends(get_current_user)
     connection = get_connection()
     cursor = connection.cursor(cursor_factory=RealDictCursor)
 
@@ -70,7 +72,7 @@ def get_member(member_id: int):
 
 ## POST /members
 @router.post("", status_code=201)
-def create_member(member: MemberCreate):
+def create_member(member: MemberCreate, current_admin=Depends(require_admin)):
 
     connection = get_connection()
 
@@ -124,7 +126,9 @@ def create_member(member: MemberCreate):
 
 ## PUT /members/{id}
 @router.put("/{member_id}")
-def update_member(member_id: int, member: MemberUpdate):
+def update_member(
+    member_id: int, member: MemberUpdate, current_admin=Depends(require_admin)
+):
     connection = get_connection()
 
     cursor = connection.cursor(cursor_factory=RealDictCursor)
@@ -175,7 +179,7 @@ def update_member(member_id: int, member: MemberUpdate):
 
 ## DELETE
 @router.delete("/{member_id}")
-def deactivate_member(member_id: int):
+def deactivate_member(member_id: int, current_admin=Depends(require_admin)):
     connection = get_connection()
 
     cursor = connection.cursor(cursor_factory=RealDictCursor)

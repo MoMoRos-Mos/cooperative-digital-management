@@ -5,6 +5,11 @@ const API_BASE = "http://127.0.0.1:8000";
 let allMembers = [];
 let editingMemberId = null;
 
+// Variable for Login & Logout Function
+let authToken = null;
+let currentRole = null;
+let currentUsername = null;
+
 // FUNCTION: Load data to dashboard
 async function loadDashboard() {
   const response = await fetch(`${API_BASE}/dashboard/summary`);
@@ -50,6 +55,37 @@ function renderMembers(member) {
   member.forEach((member) => {
     const row = document.createElement("tr");
 
+    // ADMIN เห็นปุ่มแก้ไข
+    // USER / Public เห็นแค่ View Only
+    const actionButtons =
+      currentRole === "ADMIN"
+        ? `
+            <button
+              onclick="editMember(${member.member_id})"
+              class="action-btn action-edit"
+              type="button"
+            >
+              <i class="bi bi-pencil-square"></i>
+              Edit
+            </button>
+
+            <button
+              onclick="deactivateMember(${member.member_id})"
+              ${member.status !== "ACTIVE" ? "disabled" : ""}
+              class="action-btn action-deactivate"
+              type="button"
+            >
+              <i class="bi bi-trash3-fill"></i>
+              Deactivate
+            </button>
+          `
+        : `
+            <span class="readonly-text">
+              <i class="bi bi-eye"></i>
+              View Only
+            </span>
+          `;
+
     row.innerHTML = `
         <td>${member.member_id}</td>
         <td>${member.member_no}</td>
@@ -58,28 +94,17 @@ function renderMembers(member) {
         
         <td>
             <span class="status-badge ${member.status.toLowerCase()}">
-            ${member.status === "ACTIVE" ? '<i class="bi bi-check-circle-fill"></i>' : '<i class="bi bi-x-circle-fill"></i>'}
+            ${
+              member.status === "ACTIVE"
+                ? '<i class="bi bi-check-circle-fill"></i>'
+                : '<i class="bi bi-x-circle-fill"></i>'
+            }
               ${member.status}
             </span>
         </td>
 
         <td>
-            <button
-                onclick="editMember(${member.member_id})"
-                class="action-btn action-edit"
-                type="button"
-            >
-            <i class="bi bi-pencil-square"></i> Edit
-            </button>
-            
-            <button
-                onclick="deactivateMember(${member.member_id})"
-                ${member.status !== "ACTIVE" ? "disabled" : ""}
-                 class="action-btn action-deactivate"
-                 type="button"
-            >
-            <i class="bi bi-trash3-fill"></i> Deactivate
-            </button>
+            ${actionButtons}
         </td>
         `;
     tbody.appendChild(row);
@@ -159,6 +184,10 @@ async function deactivateMember(memberId) {
   // Create FastAPI to Delete
   const response = await fetch(`${API_BASE}/members/${memberId}`, {
     method: "DELETE",
+
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+    },
   });
 
   // Check delete result
@@ -185,7 +214,7 @@ async function deactivateMember(memberId) {
   // Refresh website
   await loadMembers();
   await loadDashboard();
-} // <-- นี่คือวงเล็บปิดฟังก์ชันที่ถูกต้อง ต้องอยู่ตรงนี้ครับ!
+}
 
 // FUNCTION : Set up cancel edit button & Connect button event
 function SetupCancelEdit() {
@@ -323,6 +352,7 @@ function setupAddMemberForm() {
 
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${authToken}`,
       },
 
       body: JSON.stringify(requestData),
@@ -383,16 +413,117 @@ function SetSubmitLoading(isLoading) {
   }
 }
 
+// FUNCTION: Login
+async function Login() {
+  // Get const from textbox in froentendL Username
+  const username = document.getElementById("login-username").value.trim();
+
+  // Get Password
+  const password = document.getElementById("login-password").value.trim();
+
+  if (!username || !password) {
+    ShowToast("กรุณากรอก Username และ Password", "error");
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE}/auth/login`, {
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify({
+        username: username,
+        password: password,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      ShowToast(data.detail ?? "Login failed", "error");
+
+      return;
+    }
+
+    authToken = data.access_token;
+
+    currentRole = data.role;
+
+    currentUsername = username;
+
+    updateAUthUI();
+
+    ShowToast(`Login สำเร็จ: ${currentRole}`, "success");
+  } catch (error) {
+    console.log("Login error:", error);
+
+    ShowToast("ไม่สามารถเชื่อมต่อระบบ Login ได้", "error");
+  }
+}
+
+// FUNCTION: Logout
+function LogOut() {
+  authToken = null;
+  currentRole = null;
+  currentUsername = null;
+
+  document.getElementById("login-username").value = "";
+  document.getElementById("login-password").value = "";
+
+  updateAUthUI();
+
+  ShowToast("Logout สำเร็จ", "success");
+}
+
+// FUNCTION: Update auth gui
+function updateAUthUI() {
+  const loginBox = document.getElementById("login-box");
+  const userBox = document.getElementById("user-box");
+  const userText = document.getElementById("current-user-text");
+  const managementSection = document.getElementById(
+    "member-management-section",
+  );
+
+  const isLoggIn = authToken !== null;
+
+  const isAdmin = currentRole === "ADMIN";
+
+  loginBox.style.display = isLoggIn ? "none" : "flex";
+
+  userBox.style.display = isLoggIn ? "flex" : "none";
+
+  if (isLoggIn) {
+    userText.textContent = `${currentUsername} (${currentRole})`;
+  }
+
+  managementSection.style.display = isAdmin ? "block" : "none";
+
+  renderMembers(allMembers);
+}
+
 // MAIN FUNCTION: Start app run all function to work
 async function startApp() {
   try {
-    await Promise.all([loadDashboard(), loadMembers()]);
+    
+    await Promise.all([
+      loadDashboard(),
+      loadMembers()
+  ]);
+
+    updateAUthUI();
 
     setupMemberSearch();
     setupAddMemberForm();
     SetupCancelEdit();
+
+    document.getElementById("login-button").addEventListener("click", Login);
+
+    document.getElementById("logout-button").addEventListener("click", LogOut);
   } catch (error) {
-    console.error("Cannot load application");
+    console.error("Cannot load application:", error);
   }
 }
 
